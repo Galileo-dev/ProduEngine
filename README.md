@@ -1,6 +1,8 @@
-# Foobar
+# Features
 
-Foobar is a Python library for dealing with word pluralization.
+ - Decentrilized 
+ - Light and Clean
+ - Always Under Development
 
 ## Installation
 
@@ -10,15 +12,9 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
 pip install foobar
 ```
 
-## Usage 
+## Trell Board 
+ (https://trello.com/b/bKLMEAsr)
 
-```python
-import foobar
-
-foobar.pluralize('word') # returns 'words'
-foobar.pluralize('goose') # returns 'geese'
-foobar.singularize('phenomena') # returns 'phenomenon'
-```
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

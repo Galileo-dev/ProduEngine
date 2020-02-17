@@ -13,7 +13,7 @@ pip install foobar
 ```
 
 ## Development 
-  Most development decisions will be shown on [the produ trello board](https://trello.com/b/bKLMEAsr)
+  Most development decisions will be shown on the [Produ trello board](https://trello.com/b/bKLMEAsr)
 
 
 ## Contributing

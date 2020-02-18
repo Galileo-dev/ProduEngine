@@ -6,11 +6,8 @@
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+Still To Be Decided
 
-```bash
-pip install foobar
-```
 
 ## Development 
   Most development decisions will be shown on the [Produ trello board](https://trello.com/b/bKLMEAsr)

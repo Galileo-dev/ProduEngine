@@ -1,10 +1,10 @@
-// use vulkano::device::Device;
-// use vulkano::format::{ClearValue, Format};
+use vulkano::device::Device;
+use vulkano::format::{ClearValue, Format};
 // use vulkano::framebuffer::{LoadOp, RenderPassAbstract, RenderPassDesc};
 
-// use std::sync::Arc;
+use std::sync::Arc;
 
-// type RenderPass = Arc<dyn RenderPassAbstract + Send + Sync>;
+type RenderPass = Arc<RenderPass>;
 
 // // TODO: let user provide own format for color buffers
 // const DEFAULT_COLOR_FORMAT: Format = vulkano::format::Format::B8G8R8A8Unorm;
@@ -13,39 +13,39 @@
 // // TODO: resolve_depth is not needed. I think, at least - programs run without
 // // it, but make sure no jaggedness in introduced by removing it.
 
-// pub fn multisampled_with_depth(device: Arc<Device>, factor: u32) -> RenderPass {
-//     Arc::new(
-//         vulkano::single_pass_renderpass!(
-//             device.clone(),
-//             attachments: {
-//                 resolve_color: {
-//                     load: Clear,
-//                     store: Store,
-//                     format: DEFAULT_COLOR_FORMAT,
-//                     samples: 1,
-//                 },
-//                 multisampled_color: {
-//                     load: Clear,
-//                     store: DontCare,
-//                     format: DEFAULT_COLOR_FORMAT,
-//                     samples: factor,
-//                 },
-//                 multisampled_depth: {
-//                     load: Clear,
-//                     store: DontCare,
-//                     format: DEFAULT_DEPTH_FORMAT,
-//                     samples: factor,
-//                 }
-//             },
-//             pass: {
-//                 color: [multisampled_color],
-//                 depth_stencil: {multisampled_depth},
-//                 resolve: [resolve_color]
-//             }
-//         )
-//         .unwrap(),
-//     )
-// }
+pub fn multisampled_with_depth(device: Arc<Device>, factor: u32) -> RenderPass {
+    Arc::new(
+        vulkano::single_pass_renderpass!(
+            device.clone(),
+            attachments: {
+                resolve_color: {
+                    load: Clear,
+                    store: Store,
+                    format: DEFAULT_COLOR_FORMAT,
+                    samples: 1,
+                },
+                multisampled_color: {
+                    load: Clear,
+                    store: DontCare,
+                    format: DEFAULT_COLOR_FORMAT,
+                    samples: factor,
+                },
+                multisampled_depth: {
+                    load: Clear,
+                    store: DontCare,
+                    format: DEFAULT_DEPTH_FORMAT,
+                    samples: factor,
+                }
+            },
+            pass: {
+                color: [multisampled_color],
+                depth_stencil: {multisampled_depth},
+                resolve: [resolve_color]
+            }
+        )
+        .unwrap(),
+    )
+}
 
 // pub fn multisampled(device: Arc<Device>, factor: u32) -> RenderPass {
 //     Arc::new(

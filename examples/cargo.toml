@@ -1,0 +1,18 @@
+[package]
+name = "examples"
+version = "0.1.0"
+authors = ["Galileo <Galileo-dev@users.noreply.github.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+produ-render = { path = "../produ-render/" }
+# produ-systems = { path = "../produ-systems/" }
+# nalgebra-glm = "0.4.2"
+# vulkano = "0.14"
+# vulkano-win = "0.14"
+# winit = "0.19"
+# rand = "0.7.2"
+# tobj = "0.1.11"
+# image = "0.22.3"

@@ -1,3 +1,6 @@
+use std::borrow::Borrow;
+use std::fs::File;
+use std::io::Read;
 use std::sync::Arc;
 use vulkano::buffer::{cpu_access::CpuAccessibleBuffer, BufferUsage};
 use vulkano::command_buffer::{
@@ -7,13 +10,11 @@ use vulkano::device::{Device, DeviceExtensions};
 use vulkano::image::view::ImageView;
 use vulkano::image::{ImageUsage, SwapchainImage};
 use vulkano::instance::{Instance, PhysicalDevice};
+use vulkano::pipeline::shader::ShaderModule;
 use vulkano::pipeline::viewport::Viewport;
 use vulkano::pipeline::GraphicsPipeline;
 use vulkano::render_pass::{Framebuffer, FramebufferAbstract, RenderPass, Subpass};
-use vulkano::swapchain::{
-    self, AcquireError, FullscreenExclusive, PresentMode, SurfaceTransform, Swapchain,
-    SwapchainCreationError,
-};
+v
 use vulkano::sync::{self, FlushError, GpuFuture};
 use vulkano::Version;
 use vulkano_win::VkSurfaceBuild;
@@ -22,7 +23,7 @@ use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::{Window, WindowBuilder};
 fn main() {
     //?================================================ Config Viewport ================================================
-    let viewport_origin: [f32; 2] = [50.0, 0.0];
+    let viewport_origin: [f32; 2] = [50.0, 0.0];    
 
     //?================================================= Main Function =================================================
     //  This gives us the Required Extensions to Start a window"
@@ -138,48 +139,22 @@ fn main() {
     };
     //println!("Buffer: {:?}", vertex_buffer);
 
-    mod vs {
-        vulkano_shaders::shader! {
-            ty: "vertex",
-            src: "
-                #version 450
-                
-                layout(location = 0) in vec2 position;
+    let vs = {
+        let path = "../shaders/shaded-teapot/vert.spv";
+        let mut f = File::open(path).expect(&("Can't find file".to_string() + path.borrow()));
+        let mut v = vec![];
+        f.read_to_end(&mut v).unwrap();
+        unsafe { ShaderModule::new(device.clone(), &v) }.unwrap()
+    };
+    let fs = {
+        let path = "../shaders/shaded-teapot/frag.spv".to_string();
 
-                layout(location = 1) out vec4 vertex_color;
-                
-                vec4 colors[3] = vec4[3](
-                    vec4(1.0, 0.0, 0.0, 1.0),
-                    vec4(0.0, 1.0, 0.0, 1.0),
-                    vec4(0.0, 0.0, 1.0, 1.0)
-                );
+        let mut f = File::open(path).expect(&("Can't find file".to_string() + path.borrow()));
+        let mut v = vec![];
+        f.read_to_end(&mut v).unwrap();
+        unsafe { ShaderModule::new(device.clone(), &v) }.unwrap()
+    };
 
-                void main() {
-                    gl_Position = vec4(position,0.0, 1.0);
-                    vertex_color = colors[gl_VertexIndex];
-                }
-                "
-        }
-    }
-
-    mod fs {
-        vulkano_shaders::shader! {
-            ty: "fragment",
-            src: "
-                #version 450
-                layout(location = 0) out vec4 f_color;
-                
-                layout(location = 1) in vec4 vertex_color;
-                    
-                void main() {
-                    f_color = vertex_color;
-                }
-                "
-        }
-    }
-
-    let vs = vs::Shader::load(device.clone()).unwrap();
-    let fs = fs::Shader::load(device.clone()).unwrap();
     let render_pass = Arc::new(
         vulkano::single_pass_renderpass!(device.clone(),
          attachments: {

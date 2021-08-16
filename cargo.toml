@@ -1,0 +1,5 @@
+[workspace]
+members = ["produ-render", "produ-systems", "examples"]
+
+[profile.dev]
+opt-level = 3

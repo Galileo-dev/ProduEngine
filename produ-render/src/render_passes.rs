@@ -1,19 +1,21 @@
 use vulkano::device::Device;
 use vulkano::format::{ClearValue, Format};
+use vulkano::render_pass::AttachmentDesc;
+use vulkano::render_pass::LoadOp;
+use vulkano::render_pass::RenderPass;
 // use vulkano::framebuffer::{LoadOp, RenderPassAbstract, RenderPassDesc};
 
 use std::sync::Arc;
 
-type RenderPass = Arc<RenderPass>;
+// TODO: let user provide own format for color buffers
+const DEFAULT_COLOR_FORMAT: Format = vulkano::format::Format::B8G8R8A8Unorm;
+const DEFAULT_DEPTH_FORMAT: Format = vulkano::format::Format::D32Sfloat;
 
-// // TODO: let user provide own format for color buffers
-// const DEFAULT_COLOR_FORMAT: Format = vulkano::format::Format::B8G8R8A8Unorm;
-// const DEFAULT_DEPTH_FORMAT: Format = vulkano::format::Format::D32Sfloat;
+// TODO: resolve_depth is not needed. I think, at least - programs run without
 
-// // TODO: resolve_depth is not needed. I think, at least - programs run without
-// // it, but make sure no jaggedness in introduced by removing it.
+// it, but make sure no jaggedness in introduced by removing it.
 
-pub fn multisampled_with_depth(device: Arc<Device>, factor: u32) -> RenderPass {
+pub fn multisampled_with_depth(device: Arc<Device>, factor: u32) -> Arc<RenderPass> {
     Arc::new(
         vulkano::single_pass_renderpass!(
             device.clone(),
@@ -150,46 +152,47 @@ pub fn multisampled_with_depth(device: Arc<Device>, factor: u32) -> RenderPass {
 //     )
 // }
 
-// pub fn basic(device: Arc<Device>) -> RenderPass {
-//     Arc::new(
-//         vulkano::single_pass_renderpass!(
-//             device.clone(),
-//             attachments: {
-//                 color: {
-//                     load: Clear,
-//                     store: Store,
-//                     format: DEFAULT_COLOR_FORMAT,
-//                     samples: 1,
-//                 }
-//             },
-//             pass: {
-//                 color: [color],
-//                 depth_stencil: {}
-//             }
-//         )
-//         .unwrap(),
-//     )
-// }
+pub fn basic(device: Arc<Device>) -> Arc<RenderPass> {
+    Arc::new(
+        vulkano::single_pass_renderpass!(
+            device.clone(),
+            attachments: {
+                color: {
+                    load: Clear,
+                    store: Store,
+                    format: DEFAULT_COLOR_FORMAT,
+                    samples: 1,
+                }
+            },
+            pass: {
+                color: [color],
+                depth_stencil: {}
+            }
+        )
+        .unwrap(),
+    )
+}
 
 // // TODO: add every format to this
-// pub fn clear_values_for_pass(
-//     render_pass: Arc<dyn RenderPassAbstract + Send + Sync>,
-// ) -> Vec<ClearValue> {
-//     render_pass
-//         .attachment_descs()
-//         .map(|desc| match desc.load {
-//             LoadOp::Clear => match desc.format {
-//                 Format::B8G8R8A8Unorm => [0.0, 0.0, 0.0, 1.0].into(),
-//                 Format::R8G8B8A8Unorm => [0.0, 0.0, 0.0, 1.0].into(),
-//                 Format::R32G32B32A32Sfloat => [0.0, 0.0, 0.0, 0.0].into(),
-//                 Format::R16G16B16A16Sfloat => [0.0, 0.0, 0.0, 0.0].into(),
-//                 Format::D16Unorm => 1f32.into(),
-//                 Format::D32Sfloat => 1f32.into(),
-//                 // TODO: make the panic print the bad format
-//                 _ => panic!("You provided a format that the clear values couldn't be guessed for!"),
-//             },
-//             LoadOp::DontCare => ClearValue::None,
-//             LoadOp::Load => ClearValue::None,
-//         })
-//         .collect()
-// }
+
+pub fn clear_values_for_pass(render_pass: Arc<RenderPass>) -> Vec<ClearValue> {
+    render_pass
+        .desc()
+        .attachments()
+        .iter()
+        .map(|desc| match desc.load {
+            LoadOp::Clear => match desc.format {
+                Format::B8G8R8A8Unorm => [0.0, 0.0, 0.0, 1.0].into(),
+                Format::R8G8B8A8Unorm => [0.0, 0.0, 0.0, 1.0].into(),
+                Format::R32G32B32A32Sfloat => [0.0, 0.0, 0.0, 0.0].into(),
+                Format::R16G16B16A16Sfloat => [0.0, 0.0, 0.0, 0.0].into(),
+                Format::D16Unorm => 1f32.into(),
+                Format::D32Sfloat => 1f32.into(),
+                // TODO: make the panic print the bad format
+                _ => panic!("You provided a format that the clear values couldn't be guessed for!"),
+            },
+            LoadOp::DontCare => ClearValue::None,
+            LoadOp::Load => ClearValue::None,
+        })
+        .collect()
+}

@@ -10,4 +10,6 @@ edition = "2018"
 vulkano = { git = "https://github.com/vulkano-rs/vulkano", rev = "629fff8" }
 vulkano-win = { git = "https://github.com/vulkano-rs/vulkano", rev = "629fff8" }
 vulkano-shaders = { git = "https://github.com/vulkano-rs/vulkano", rev = "629fff8" }
-winit = "0.25"
+nalgebra-glm = "0.15.0"
+winit = "0.25.0"
+tobj = "3.2.0"

@@ -14,7 +14,6 @@ use vulkano::pipeline::shader::ShaderModule;
 use vulkano::pipeline::viewport::Viewport;
 use vulkano::pipeline::GraphicsPipeline;
 use vulkano::render_pass::{Framebuffer, FramebufferAbstract, RenderPass, Subpass};
-v
 use vulkano::sync::{self, FlushError, GpuFuture};
 use vulkano::Version;
 use vulkano_win::VkSurfaceBuild;
@@ -23,7 +22,7 @@ use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::{Window, WindowBuilder};
 fn main() {
     //?================================================ Config Viewport ================================================
-    let viewport_origin: [f32; 2] = [50.0, 0.0];    
+    let viewport_origin: [f32; 2] = [50.0, 0.0];
 
     //?================================================= Main Function =================================================
     //  This gives us the Required Extensions to Start a window"

@@ -1,6 +1,7 @@
 use vulkano::device::{Device, Queue};
 // use vulkano::framebuffer::RenderPassAbstract;
 use vulkano::image::{ImageUsage, SwapchainImage};
+use vulkano::render_pass::RenderPass;
 use vulkano::swapchain::{
     AcquireError, Capabilities, FullscreenExclusive, PresentMode, Surface, SurfaceTransform,
     Swapchain, SwapchainCreationError,
@@ -17,7 +18,7 @@ pub struct VkWindow {
     swapchain: Arc<Swapchain<Window>>,
     images: Vec<Arc<SwapchainImage<Window>>>,
     surface: Arc<Surface<Window>>,
-    // render_pass: Arc<dyn RenderPassAbstract + Send + Sync>,
+    render_pass: Arc<RenderPass>,
     image_num: Option<usize>,
     future: Option<Box<dyn GpuFuture>>,
     previous_frame_end: Option<Box<dyn GpuFuture>>,
@@ -29,7 +30,7 @@ impl VkWindow {
         device: Arc<Device>,
         queue: Arc<Queue>,
         surface: Arc<Surface<Window>>,
-        // render_pass: Arc<dyn RenderPassAbstract + Send + Sync>,
+        render_pass: Arc<RenderPass>,
         caps: Capabilities,
     ) -> Self {
         // create swapchain
@@ -45,7 +46,7 @@ impl VkWindow {
             swapchain,
             images,
             surface,
-            // render_pass,
+            render_pass,
             image_num: None,
             // TODO: better name
             future: None,
@@ -56,9 +57,9 @@ impl VkWindow {
         }
     }
 
-    // pub fn set_render_pass(&mut self, new_render_pass: Arc<dyn RenderPassAbstract + Send + Sync>) {
-    //     self.render_pass = new_render_pass;
-    // }
+    pub fn set_render_pass(&mut self, new_render_pass: Arc<RenderPass>) {
+        self.render_pass = new_render_pass;
+    }
 
     pub fn next_image(&mut self) -> Arc<SwapchainImage<Window>> {
         // TODO: this does more than the name suggests, which is not so great

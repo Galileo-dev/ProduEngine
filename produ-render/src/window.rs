@@ -1,13 +1,15 @@
 use std::sync::Arc;
 
+use crate::input::{EventHandler, FrameInfo};
+use crate::utils::Timer;
 use vulkano::device::{Device, DeviceExtensions, Queue};
 use vulkano::image::SwapchainImage;
 use vulkano::instance::{Instance, PhysicalDevice};
+use vulkano::render_pass::RenderPass;
 use vulkano::swapchain::Surface;
 use vulkano::sync::GpuFuture;
 use vulkano::Version;
 use vulkano_win::VkSurfaceBuild;
-
 use winit::event_loop::EventLoop;
 use winit::window::WindowBuilder;
 
@@ -17,7 +19,10 @@ use crate::vk_window::VkWindow;
 pub struct Window {
     vk_window: VkWindow,
     queue: Arc<Queue>,
+    render_pass: Arc<RenderPass>,
     recenter: bool,
+    update_timer: Timer,
+    event_handler: EventHandler,
 }
 
 impl Window {
@@ -28,6 +33,7 @@ impl Window {
         let device = queue.device().clone();
 
         let event_loop = EventLoop::new();
+        let event_handler = EventHandler::new(events_loop);
         let surface = WindowBuilder::new()
             .build_vk_surface(&event_loop, instance.clone())
             .expect("Expected to create a window for vulkan instance, (‡▼益▼)");
@@ -37,20 +43,22 @@ impl Window {
         let physical = PhysicalDevice::enumerate(&instance).next().unwrap();
         let swapchain_caps = surface.capabilities(physical).unwrap();
 
-        // let render_pass = render_passes::basic(device.clone());
+        let render_pass = render_passes::basic(device.clone());
 
         let vk_window = VkWindow::new(
             queue.device().clone(),
             queue.clone(),
             surface.clone(),
-            // render_pass.clone(),
+            render_pass.clone(),
             swapchain_caps.clone(),
         );
 
         let window = Self {
             vk_window,
             queue: queue.clone(),
+            render_pass,
             recenter: true,
+            update_timer: Timer::new("Avg. time to update window"),
         };
 
         (window, queue)
@@ -93,10 +101,25 @@ impl Window {
         self.vk_window.get_dimensions()
     }
 
-    // pub fn set_render_pass(&mut self, new_render_pass: Arc<dyn RenderPassAbstract + Send + Sync>) {
-    //     self.vk_window.set_render_pass(new_render_pass);
-    //     self.vk_window.rebuild();
-    // }
+    pub fn set_render_pass(&mut self, new_render_pass: Arc<RenderPass>) {
+        self.vk_window.set_render_pass(new_render_pass);
+        self.vk_window.rebuild();
+    }
+
+    pub fn update(&mut self) -> bool {
+        self.update_timer.start();
+
+        // returns whether to exit the program or not
+        // TODO: return an enum or move the done-checking to its own function
+        let done = self.event_handler.update(self.get_dimensions());
+        if self.recenter {
+            self.recenter_cursor();
+        }
+
+        self.update_timer.stop();
+
+        done
+    }
 }
 
 fn get_instance() -> Arc<Instance> {
